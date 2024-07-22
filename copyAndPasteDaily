@@ -1,0 +1,68 @@
+//매일 주말여부를 판단후 주말이 아닌경우 데이터를 백업
+function copyAndPasteDaily() {
+  var sourceSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("일일처리량_계합");
+  var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("일일취합_데이터");
+  
+  if (!sourceSheet) {
+    throw new Error("소스 시트를 찾을 수 없습니다.");
+  }
+  
+  if (!targetSheet) {
+    throw new Error("타겟 시트를 찾을 수 없습니다.");
+  }
+
+  // 현재 날짜 가져오기
+  var today = new Date();
+  Logger.log("오늘 날짜: " + today);
+  if (!today) {
+    throw new Error("오늘 날짜를 가져올 수 없습니다.");
+  }
+
+  // 주말이면 함수 종료
+  var dayOfWeek = today.getDay();
+  Logger.log("요일: " + dayOfWeek);
+  if (dayOfWeek === 0 || dayOfWeek === 6) {
+    Logger.log("주말입니다. 함수를 종료합니다.");
+    return; // 0은 일요일, 6은 토요일
+  }
+
+  // 올해 첫 날부터 오늘까지의 일수를 계산하여 평일 카운트
+  var startRow = daysSinceJuly1st() + 3;
+
+    // 복사할 소스 범위 목록 정의
+  var sourceRanges = [
+    "A3:F3", "A7:F7", "A11:F11", "A15:F15"
+  ];
+
+  var s = startRow;
+
+  var targetRanges =[
+    "B"+s+":G"+s,
+    "H"+s+":M"+s,
+    "N"+s+":S"+s,
+    "T"+s+":Y"+s,
+  ] 
+
+  // 각 소스 범위를 반복하며 데이터를 타겟 범위에 복사
+  for (var i = 0; i < sourceRanges.length; i++) {
+    var sourceRange = sourceSheet.getRange(sourceRanges[i]);
+    var targetRange = targetSheet.getRange(targetRanges[i]);
+    
+    // 소스 범위의 값을 타겟 범위에 복사
+    sourceRange.copyTo(targetRange, {contentsOnly:true});
+  }
+}
+
+//2024-07-01로 부터 경과한 일자
+function daysSinceJuly1st() {
+    const startDate = new Date(2024, 6, 1); // JavaScript에서 월은 0부터 시작하므로 7월은 6으로 설정
+    const currentDate = new Date();
+    
+    // 두 날짜의 차이를 밀리초 단위로 계산
+    const differenceInTime = currentDate - startDate;
+    
+    // 밀리초를 일수로 변환
+    const differenceInDays = Math.floor(differenceInTime / (1000 * 60 * 60 * 24));
+    
+    return differenceInDays;
+}
