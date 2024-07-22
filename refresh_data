@@ -1,0 +1,31 @@
+// 매일 초기화후 매일 백업데이터 보존
+function refresh_data() {
+  // "일일처리량_보고" 시트 가져오기
+  var sht = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("일일처리량_보고");
+  backupData();
+
+  // 범위 목록 정의
+  var ranges = [
+    "C3:C11", "G3:G11", "K3:K11", "O3:O11", "S3:S11",
+    "C13:C21", "G13:G21", "K13:K21", "O13:O21", "S13:S21",
+    "C23:C31", "G23:G31", "K23:K31", "O23:O31", "S23:S31",
+    "C33:C41", "G33:G41", "K33:K41", "O33:O41", "S33:S41"
+  ];
+
+  // 각 범위를 반복하며 내용 지우기
+  for (var i = 0; i < ranges.length; i++) {
+    var rng = sht.getRange(ranges[i]);
+    rng.clearContent();
+  }
+}
+
+function backupData() {
+  // "일일처리량_보고" 시트 가져오기
+  var sourceSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("일일처리량_보고");
+  var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("일일처리량_보고(백업데이터)");
+
+  var sourceRange = sourceSheet.getRange("A1:W41");
+  var targetRange = targetSheet.getRange("A1:W41");
+
+  sourceRange.copyTo(targetRange);
+}
